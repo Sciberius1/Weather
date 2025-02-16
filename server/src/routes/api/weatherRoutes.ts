@@ -8,32 +8,46 @@ import WeatherService from '../../service/weatherService.js';
 router.post('/', async (req: Request, res: Response) => {
   try {
     const { cityName } = req.body;
-    const weatherData = await WeatherService.getWeatherForCity(cityName);
+    if (!cityName) {
+      return res.status(400).json({ error: 'City name is required' });
+    }
+
+    // GET weather data from city name
+    const weatherData = await WeatherService.getWeatherByCityName(cityName);
+
+    // Save city to search history
     await HistoryService.saveCityToHistory(cityName);
+
     res.status(200).json(weatherData);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to retrieve weather data' });
+    res.status(500).json({ error: 'An error occurred while retrieving weather data' });
   }
 });
 
 // GET search history
-router.get('/history', async (_req: Request, res: Response) => {
+router.get('/history', async (req: Request, res: Response) => {
   try {
     const history = await HistoryService.getSearchHistory();
     res.status(200).json(history);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to retrieve search history' });
+    res.status(500).json({ error: 'An error occurred while retrieving search history' });
   }
 });
 
-// DELETE city from search history
+// * BONUS TODO: DELETE city from search history
 router.delete('/history/:id', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    await HistoryService.removeCity(id);
-    res.status(200).json({ message: 'City removed from history' });
+    if (!id) {
+      return res.status(400).json({ error: 'ID is required' });
+    }
+
+    // DELETE city from search history by ID
+    await HistoryService.deleteCityFromHistory(id);
+
+    res.status(200).json({ message: 'City deleted from search history' });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to remove city from history' });
+    res.status(500).json({ error: 'An error occurred while deleting city from search history' });
   }
 });
 
