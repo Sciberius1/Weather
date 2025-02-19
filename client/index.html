@@ -60,8 +60,10 @@
   <div>
     <input type="text" id="cityInput" placeholder="Enter city name">
     <button onclick="getWeather()">Get Weather</button>
+    <button onclick="getForecast()">Get 5-Day Forecast</button>
   </div>
   <div id="weatherDisplay"></div>
+  <div id="forecastDisplay"></div>
   <div id="historyDisplay"></div>
   <script type="module" src="/src/main.ts"></script>
   <script>
@@ -76,6 +78,19 @@
       addToHistory(city, data);
     }
 
+    async function getForecast() {
+      const city = document.getElementById('cityInput').value;
+      const response = await fetch('/weather/forecast', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ cityName: city })
+      });
+      const data = await response.json();
+      displayForecast(data);
+    }
+
     function displayWeather(data) {
       const weatherDisplay = document.getElementById('weatherDisplay');
       weatherDisplay.innerHTML = `
@@ -85,6 +100,20 @@
       `;
     }
 
+    function displayForecast(data) {
+      const forecastDisplay = document.getElementById('forecastDisplay');
+      forecastDisplay.innerHTML = '<h2>5-Day Forecast</h2>';
+      data.list.forEach(item => {
+        const forecastItem = document.createElement('div');
+        forecastItem.innerHTML = `
+          <p>Date: ${item.dt_txt}</p>
+          <p>Temperature: ${item.main.temp}K</p>
+          <p>Weather: ${item.weather[0].description}</p>
+        `;
+        forecastDisplay.appendChild(forecastItem);
+      });
+    }
+
     function addToHistory(city, data) {
       const historyDisplay = document.getElementById('historyDisplay');
       const historyItem = document.createElement('div');
@@ -92,9 +121,26 @@
         <h3>${city}</h3>
         <p>Temperature: ${data.main.temp}K</p>
         <p>Weather: ${data.weather[0].description}</p>
+        <button onclick="removeFromHistory('${city}')">Remove</button>
       `;
       historyDisplay.appendChild(historyItem);
     }
+
+    async function removeFromHistory(city) {
+      await fetch(`/weather/history/${city}`, {
+        method: 'DELETE'
+      });
+      document.getElementById('historyDisplay').innerHTML = '';
+      loadHistory();
+    }
+
+    async function loadHistory() {
+      const response = await fetch('/weather/history');
+      const history = await response.json();
+      history.forEach(city => addToHistory(city, {}));
+    }
+
+    window.onload = loadHistory;
   </script>
 </body>
 

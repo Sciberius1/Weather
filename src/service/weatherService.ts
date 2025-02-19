@@ -2,9 +2,9 @@ class WeatherService {
     private apiKey: string;
     private apiUrl: string;
 
-    constructor(apiKey: string, apiUrl: string) {
-        this.apiKey = apiKey;
-        this.apiUrl = apiUrl;
+    constructor() {
+        this.apiKey = process.env.API_KEY || '';
+        this.apiUrl = process.env.API_BASE_URL || '';
     }
 
     async getWeatherByCityName(cityName: string): Promise<any> {
@@ -15,9 +15,13 @@ class WeatherService {
         return response.json();
     }
 
-    // Remove unused methods
-    // private buildGeocodeQuery(): string { ... }
-    // private buildForecastArray(currentWeather: Weather, weatherData: any[]): Weather[] { ... }
+    async get5DayForecastByCityName(cityName: string): Promise<any> {
+        const response = await fetch(`${this.apiUrl}/forecast?q=${cityName}&appid=${this.apiKey}`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch weather forecast data');
+        }
+        return response.json();
+    }
 }
 
 export default WeatherService;

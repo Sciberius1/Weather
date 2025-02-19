@@ -47,22 +47,37 @@ const fetchWeather = async (cityName: string) => {
 
   console.log('weatherData: ', weatherData);
 
-  renderCurrentWeather(weatherData[0]);
-  renderForecast(weatherData.slice(1));
+  renderCurrentWeather(weatherData);
+};
+
+const fetchForecast = async (cityName: string) => {
+  const response = await fetch('/api/weather/forecast', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ cityName }),
+  });
+
+  const forecastData = await response.json();
+
+  console.log('forecastData: ', forecastData);
+
+  renderForecast(forecastData);
 };
 
 const fetchSearchHistory = async () => {
-  const history = await fetch('/api/weather/history', {
+  const response = await fetch('/api/weather/history', {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
     },
   });
-  return history;
+  return response.json();
 };
 
-const deleteCityFromHistory = async (id: string) => {
-  await fetch(`/api/weather/history/${id}`, {
+const deleteCityFromHistory = async (cityName: string) => {
+  await fetch(`/api/weather/history/${cityName}`, {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
@@ -258,7 +273,9 @@ const handleSearchFormSubmit = (event: any): void => {
 
   const search: string = searchInput.value.trim();
   fetchWeather(search).then(() => {
-    getAndRenderHistory();
+    fetchForecast(search).then(() => {
+      getAndRenderHistory();
+    });
   });
   searchInput.value = '';
 };

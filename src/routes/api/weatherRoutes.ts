@@ -17,6 +17,16 @@ router.post('/', async (req: Request, res: Response) => {
   }
 });
 
+router.post('/forecast', async (req: Request, res: Response) => {
+  try {
+    const { cityName } = req.body;
+    const forecastData = await weatherService.get5DayForecastByCityName(cityName);
+    res.json(forecastData);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
+
 router.get('/history', async (_req: Request, res: Response) => {
   try {
     const history = await historyService.getSearchHistory();
