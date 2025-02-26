@@ -13,7 +13,7 @@ router.post('/', async (req: Request, res: Response) => {
     await historyService.saveCityToHistory(cityName);
     res.json(weatherData);
   } catch (error) {
-    res.status(500).send(error.message);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
@@ -32,7 +32,7 @@ router.get('/history', async (_req: Request, res: Response) => {
     const history = await historyService.getSearchHistory();
     res.json(history);
   } catch (error) {
-    res.status(500).send(error.message);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
@@ -42,7 +42,7 @@ router.delete('/history/:cityName', async (req: Request, res: Response) => {
     await historyService.deleteCityFromHistory(cityName);
     res.status(204).send();
   } catch (error) {
-    res.status(500).send(error.message);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 

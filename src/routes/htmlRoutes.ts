@@ -1,7 +1,7 @@
 import path from 'path';
-import express from 'express';
+import { Router } from 'express';
 
-const router = express.Router();
+const router = Router();
 
 // Route to serve the index.html file
 router.get('/', (req, res) => {

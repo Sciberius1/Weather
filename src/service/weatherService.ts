@@ -14,14 +14,6 @@ class WeatherService {
         }
         return response.json();
     }
-
-    async get5DayForecastByCityName(cityName: string): Promise<any> {
-        const response = await fetch(`${this.apiUrl}/forecast?q=${cityName}&appid=${this.apiKey}`);
-        if (!response.ok) {
-            throw new Error('Failed to fetch weather forecast data');
-        }
-        return response.json();
-    }
 }
 
 export default WeatherService;

@@ -35,7 +35,7 @@ class HistoryService {
     }
 
     private handleError(error: unknown): void {
-        if (error instanceof Error && error.message.includes('ENOENT')) {
+        if (error instanceof Error && (error as any).code === 'ENOENT') {
             console.error('File not found, initializing with an empty history.');
             fs.promises.writeFile(this.filePath, JSON.stringify([], null, 2));
         } else {
